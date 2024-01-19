@@ -13,7 +13,7 @@ from geometry_msgs.msg import Point
 from sensor_msgs.msg import Image
 from std_msgs.msg import String
 
-from pamaral_models.msg import HandsModelAction, HandsModelResult
+from pamaral_object_grasping_pattern_recognition.msg import HandsModelAction, HandsModelResult
 
 
 class HandsModelMediapipe:

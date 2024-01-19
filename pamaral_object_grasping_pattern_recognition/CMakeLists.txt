@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(pamaral_models)
+project(pamaral_object_grasping_pattern_recognition)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -8,15 +8,15 @@ project(pamaral_models)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-    actionlib
-    actionlib_msgs
-    genmsg
-    geometry_msgs
-    message_generation
-    roscpp
-    rospy
-    sensor_msgs
-    std_msgs
+  actionlib
+  actionlib_msgs
+  genmsg
+  geometry_msgs
+  message_generation
+  roscpp
+  rospy
+  sensor_msgs
+  std_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -54,8 +54,9 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Generate messages in the 'msg' folder
 add_message_files(
-    FILES
-    PointList.msg
+  FILES
+  MediaPipeResults.msg
+  PointList.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -67,18 +68,18 @@ add_message_files(
 
 ## Generate actions in the 'action' folder
 add_action_files(
-    FILES
-    HandsModel.action
-    PoseModel.action
+  FILES
+  HandsModel.action
+  PoseModel.action
 )
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
-    DEPENDENCIES
-    actionlib_msgs
-    geometry_msgs
-    sensor_msgs
-    std_msgs
+  DEPENDENCIES
+  actionlib_msgs
+  geometry_msgs
+  sensor_msgs
+  std_msgs
 )
 
 ################################################
@@ -112,8 +113,8 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES pamaral_models
-    CATKIN_DEPENDS geometry_msgs message_runtime roscpp rospy sensor_msgs std_msgs
+#  LIBRARIES pamaral_object_grasping_pattern_recognition
+  CATKIN_DEPENDS geometry_msgs message_runtime roscpp rospy sensor_msgs std_msgs
 #  DEPENDS system_lib
 )
 
@@ -130,7 +131,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/pamaral_models.cpp
+#   src/${PROJECT_NAME}/pamaral_object_grasping_pattern_recognition.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -141,7 +142,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/pamaral_models_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/pamaral_object_grasping_pattern_recognition_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -205,7 +206,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_pamaral_models.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_pamaral_object_grasping_pattern_recognition.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

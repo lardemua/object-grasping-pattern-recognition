@@ -11,7 +11,7 @@ import rospy
 from cv_bridge import CvBridge
 from geometry_msgs.msg import Point
 
-from pamaral_models.msg import PoseModelAction, PoseModelResult
+from pamaral_object_grasping_pattern_recognition.msg import PoseModelAction, PoseModelResult
 
 
 class PoseModelMediapipe:

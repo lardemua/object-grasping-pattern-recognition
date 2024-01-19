@@ -1,0 +1,11 @@
+<launch>
+    <arg name="input_image_topic" default="camera/color/image_raw"/>
+
+    <node name="mediapipe_processing" pkg="pamaral_object_grasping_pattern_recognition" type="mediapipe_processing.py" output="screen">
+        <param name="input_image_topic" value="$(arg input_image_topic)"/>
+    </node>
+
+    <!-- Action Servers for Mediapipe Models -->
+    <node name="hands_model_mediapipe" pkg="pamaral_object_grasping_pattern_recognition" type="hands_model_mediapipe.py" output="screen"/>
+    <node name="pose_model_mediapipe" pkg="pamaral_object_grasping_pattern_recognition" type="pose_model_mediapipe.py" output="screen"/>
+</launch>
