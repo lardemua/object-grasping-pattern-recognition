@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-import csv
-import numpy as np
+import json
 import os
 import rosbag
 import rospy
@@ -28,59 +27,61 @@ class DatasetMediaPipePreprocessing:
                 self.filenames.append(filename)
         
         # Create the Image Publisher        
-        self.image_publisher = rospy.Publisher(output_image_topic, Image, queue_size=300)
+        self.image_publisher = rospy.Publisher(output_image_topic, Image, queue_size=1)
         self.preprocessed_points_sub = rospy.Subscriber("mediapipe_results", MediaPipeResults, self.mediapipe_results_callback)
 
     def mediapipe_results_callback(self, msg):
-        # Extract and write the hands keypoints from the message
-        points = [[p.x, p.y, p.z] for p in msg.hands_keypoints]
-        points = np.array(points)
+        # Extract the data from the message
+        handednesses = [h.data for h in msg.handednesses]
+        hands_keypoints = [[p.x, p.y, p.z] for p in msg.hands_keypoints]
+        pose_keypoints = [[p.x, p.y, p.z] for p in msg.pose_keypoints]
 
-        with open(self.hands_csv_path, 'a+', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(points)
-        
-        # Extract and write the pose keypoints from the message
-        points = [[p.x, p.y, p.z] for p in msg.pose_keypoints]
-        points = np.array(points)
+        self.data.append({
+            'handednesses': handednesses,
+            'hands_keypoints': hands_keypoints,
+            'pose_keypoints': pose_keypoints
+        })
 
-        with open(self.pose_csv_path, 'a+', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(points)
+        if len(self.messages) > 0:
+            self.image_publisher.publish(self.messages.pop(0))
         
-        # Play next bag file
-        self.num_messages -= 1
-        if self.num_messages == 0:
-            self.filenames = self.filenames[1:]
-            self.play_next_bag_file()
+        else:
+            # Save the data to a JSON file
+            with open(os.path.join(self.output_folder, self.filenames.pop(0)[:-4] + ".json"), 'a+') as file:
+                json.dump(self.data, file)
+            
+            self.read_next_bag_file()
     
-    def play_next_bag_file(self):
-        bag = rosbag.Bag(os.path.join(self.input_folder, self.filenames[0]))
+    def read_next_bag_file(self):
+        if len(self.filenames) > 0:
+            # Reset the data
+            self.data = []
 
-        self.num_messages = bag.get_message_count()
-        self.hands_csv_path = os.path.join(f"{self.output_folder}/hands_keypoints", self.filenames[0][:-4]+".csv")
-        self.pose_csv_path = os.path.join(f"{self.output_folder}/pose_keypoints", self.filenames[0][:-4]+".csv")
+            # Read the bag file
+            bag = rosbag.Bag(os.path.join(self.input_folder, self.filenames[0]))
+            self.messages = [x[1] for x in bag.read_messages()]
 
-        for topic, msg, t in bag.read_messages():
-            self.image_publisher.publish(msg)
+            # Publish 1st message
+            self.image_publisher.publish(self.messages.pop(0))
+        
+        else:
+            print("All bag files processed")
 
 
 def main():
-    default_node_name = 'dataset_processing'
+    default_node_name = 'dataset_mediapipe_processing'
     rospy.init_node(default_node_name, anonymous=False)
 
     input_folder = rospy.get_param(rospy.search_param('input_folder'))
     output_image_topic = rospy.get_param(rospy.search_param('output_image_topic'))
     output_folder = rospy.get_param(rospy.search_param('output_folder'))
     os.makedirs(output_folder, exist_ok=True)
-    os.makedirs(f"{output_folder}/hands_keypoints", exist_ok=True)
-    os.makedirs(f"{output_folder}/pose_keypoints", exist_ok=True)
 
-    dataset_processing = DatasetMediaPipePreprocessing(input_folder=input_folder, output_image_topic=output_image_topic, output_folder=output_folder)
+    dataset_mediapipe_processing = DatasetMediaPipePreprocessing(input_folder=input_folder, output_image_topic=output_image_topic, output_folder=output_folder)
 
     input()
 
-    dataset_processing.play_next_bag_file()
+    dataset_mediapipe_processing.read_next_bag_file()
 
     rospy.spin()
 
