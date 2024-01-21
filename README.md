@@ -12,4 +12,8 @@ roslaunch pamaral_object_grasping_pattern_recognition dataset_mediapipe_preproce
 
 ### Data Preprocessing
 
+```
+roslaunch pamaral_object_grasping_pattern_recognition dataset_keypoints_preprocessing.launch
+```
+
 ### Train Model

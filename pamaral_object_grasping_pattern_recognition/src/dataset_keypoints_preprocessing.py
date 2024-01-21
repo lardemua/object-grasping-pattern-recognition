@@ -34,7 +34,8 @@ class DatasetKeypointsPreprocessing:
         # Extract and write the hands keypoints from the message
         points = [[p.x, p.y, p.z] for p in msg.points]
 
-        self.data.append({'points': points})
+        if len(points) > 0:
+            self.data.append({'points': points})
 
         if len(self.mediapipe_results) > 0:
             self.mediapipe_results_publisher.publish(MediaPipeResults(**self.mediapipe_results.pop(0)))
