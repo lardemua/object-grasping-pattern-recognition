@@ -9,7 +9,7 @@ import tensorflow as tf
 
 from std_msgs.msg import String
 
-from pamaral_models.msg import PointList
+from pamaral_object_grasping_pattern_recognition.msg import PointList
 
 
 class ObjectClassifier:

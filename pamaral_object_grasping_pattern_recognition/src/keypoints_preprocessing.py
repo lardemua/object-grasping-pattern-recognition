@@ -8,22 +8,54 @@ from cv_bridge import CvBridge
 from geometry_msgs.msg import Point
 from sensor_msgs.msg import Image
 
-from pamaral_models.msg import PointList
+from pamaral_object_grasping_pattern_recognition.msg import MediaPipeResults, PointList
 
 
-class PointsPreprocessing:
+class KeypointsPreprocessing:
 
     def __init__(self):
         self.bridge = CvBridge()
         self.mp_points_image_publisher = rospy.Publisher("mp_points_image", Image, queue_size=1)
         self.preprocessed_points_publisher = rospy.Publisher("preprocessed_points", PointList, queue_size=300)
-        self.right_hand_keypoints_sub = rospy.Subscriber("right_hand_keypoints", PointList, self.mp_points_callback)
+        self.mediapipe_results_sub = rospy.Subscriber("mediapipe_results", MediaPipeResults, self.mediapipe_results_callback)
 
-    def mp_points_callback(self, msg):
-        if len(msg.points)>0:
-            points = [[p.x, p.y, p.z] for p in msg.points]
-            points = np.array(points)
+    def mediapipe_results_callback(self, msg):
+        hands_keypoints = msg.hands_keypoints
+        pose_keypoints = msg.pose_keypoints
 
+        points = None
+        if len(hands_keypoints) > 0 and len(pose_keypoints) > 0:
+            pose_keypoints = [[p.x, p.y, p.z] for p in pose_keypoints]
+            hands_keypoints = [[p.x, p.y, p.z] for p in hands_keypoints]
+
+            # obtain right and left hands centroids and valid radius
+            left_hand = np.array([pose_keypoints[15], pose_keypoints[17], pose_keypoints[19], pose_keypoints[21]])
+            right_hand = np.array([pose_keypoints[16], pose_keypoints[18], pose_keypoints[20], pose_keypoints[22]])
+
+            left_hand_centroid = np.average(left_hand, axis=0)
+            right_hand_centroid = np.average(right_hand, axis=0)
+
+            left_hand_radius = 2*np.max(np.linalg.norm(left_hand_centroid - left_hand, axis=1))
+            right_hand_radius = 2*np.max(np.linalg.norm(right_hand_centroid - right_hand, axis=1))
+
+            # separate hands keypoints
+            hands_keypoints = [hands_keypoints[i*21:(i+1)*21] for i in range(len(hands_keypoints)//21)]
+
+            # check which hand is closer to the centroid of the right hand and if it is within the valid radius
+            best_distance = 100000
+            for hand in hands_keypoints:
+                hand = np.array(hand)
+                hand_centroid = np.average(hand, axis=0)
+
+                right_hand_distance = np.linalg.norm(hand_centroid[:2] - right_hand_centroid[:2])
+                left_hand_distance = np.linalg.norm(hand_centroid[:2] - left_hand_centroid[:2])
+
+                if right_hand_distance < left_hand_distance:# and right_hand_distance < right_hand_radius:
+                    if right_hand_distance < best_distance:
+                        points = hand
+                        best_distance = right_hand_distance
+        
+        if points is not None:
             centroid = np.average(points, axis=0)
 
             points[:,0] -= centroid[0]
@@ -80,10 +112,10 @@ class PointsPreprocessing:
 
 
 def main():
-    default_node_name = 'points_preprocessing'
+    default_node_name = 'keypoints_preprocessing'
     rospy.init_node(default_node_name, anonymous=False)
 
-    PointsPreprocessing()
+    KeypointsPreprocessing()
 
     rospy.spin()
 

@@ -1,0 +1,9 @@
+<launch>
+    <include file="$(find pamaral_object_grasping_pattern_recognition)/launch/mediapipe_preprocessing.launch">
+        <arg name="input_image_topic" value="front_camera/color/image_raw"/>
+    </include>
+
+    <include file="$(find pamaral_object_grasping_pattern_recognition)/launch/keypoints_preprocessing.launch"/>
+
+    <include file="$(find pamaral_object_grasping_pattern_recognition)/launch/object_classifier.launch"/>
+</launch>
