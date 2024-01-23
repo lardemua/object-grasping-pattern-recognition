@@ -1,4 +1,5 @@
 import itertools
+import json
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -11,6 +12,46 @@ from sklearn.metrics import confusion_matrix
 plt.rcParams['svg.fonttype'] = 'none'
 plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.size'] = 15
+
+
+def read_dataset_3objects(folder_path="./../data/preprocessed_dataset", objects=["ball", "bottle", "wood_block"],
+                  people=["joel", "manuel", "pedro"], sessions=["1", "2", "3", "4"], num_samples=None):
+    x = []
+    y = []
+
+    object_ids = {"ball":0, "bottle":1, "wood_block":2}
+
+    # Iterate over all files in the folder
+    for filename in os.listdir(folder_path):
+        # Create the absolute path to the file
+        file_path = os.path.join(folder_path, filename)
+
+        # Check if the file path is a file (not a directory)
+        if os.path.isfile(file_path) and file_path.endswith(".json"):
+            filename = filename.split("_")
+            object_name = filename[0]
+            person = filename[1]
+            session = filename[2][0]
+
+            if object_name in objects and person in people and session in sessions:
+                # Open the file
+                with open(file_path, "r") as f:
+                    data = json.load(f)
+                
+                for i in range(len(data)):
+                    x.append(data[i]["points"])
+                    y.append(object_ids[object_name])
+
+    x = np.array(x)
+    y = np.array(y)
+    
+    if num_samples is not None:
+        random_indices = np.random.choice(len(y), size=num_samples, replace=False)
+
+        x = x[random_indices]
+        y = y[random_indices]
+
+    return x, y
 
 
 def read_dataset1(folder_path="./dataset_after_preprocessing"):
