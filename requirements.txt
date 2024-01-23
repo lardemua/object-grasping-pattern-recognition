@@ -1,0 +1,5 @@
+matplotlib
+mediapipe
+numpy
+scikit-learn
+tensorflow
