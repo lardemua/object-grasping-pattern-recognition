@@ -19,7 +19,7 @@ class MediaPipeProcessing:
         self.pose_model_client.wait_for_server()
 
         # Initialize Publisher for MediaPipe Results
-        self.mediapipe_results_publisher = rospy.Publisher("mediapipe_results", MediaPipeResults, queue_size=300)
+        self.mediapipe_results_publisher = rospy.Publisher("mediapipe_results", MediaPipeResults, queue_size=1)
         
         # Initialize Subscriber for Input Images
         self.image_sub = rospy.Subscriber(input_topic, Image, self.image_callback)
