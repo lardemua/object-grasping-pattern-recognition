@@ -11,7 +11,7 @@ from tensorflow.keras import layers
 from utils import *
 
 
-N_CLASSES = 4
+N_CLASSES = 3
 
 
 # model creation functions
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     # tf.random.set_seed(1234)
 
     # read data
-    x, y = read_dataset2()
+    x, y = read_dataset_3objects()
 
     input_shape = x.shape[1:]
 

@@ -2,7 +2,7 @@ FROM tensorflow/tensorflow:latest-gpu
 
 WORKDIR /model_training
 
-COPY ./dataset2_4objects /model_training/dataset2_4objects
+COPY ./dataset_after_preprocessing /model_training/dataset_after_preprocessings
 
 COPY ./docker_requirements.txt /model_training/requirements.txt
 

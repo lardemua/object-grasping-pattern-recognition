@@ -14,12 +14,12 @@ plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.size'] = 15
 
 
-def read_dataset_3objects(folder_path="./../data/preprocessed_dataset", objects=["ball", "bottle", "wood_block"],
+def read_dataset_3objects(folder_path="./../data/preprocessed_dataset", objects=["ball", "bottle", "woodblock"],
                   people=["joel", "manuel", "pedro"], sessions=["1", "2", "3", "4"], num_samples=None):
     x = []
     y = []
 
-    object_ids = {"ball":0, "bottle":1, "wood_block":2}
+    object_ids = {"ball":0, "bottle":1, "woodblock":2}
 
     # Iterate over all files in the folder
     for filename in os.listdir(folder_path):

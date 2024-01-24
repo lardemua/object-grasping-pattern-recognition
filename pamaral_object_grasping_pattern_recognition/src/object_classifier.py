@@ -16,7 +16,7 @@ class ObjectClassifier:
     def __init__(self, model_path):
         self.model = tf.keras.models.load_model(model_path)
         # self.labels = ["bottle", "cube", "phone", "screwdriver"]
-        self.labels = ["ball", "bottle", "wood_block"]
+        self.labels = ["ball", "bottle", "woodblock"]
 
         self.object_class_pub = rospy.Publisher("object_class", String, queue_size=1)
         self.preprocessed_points_sub = rospy.Subscriber("preprocessed_points", PointList, self.preprocessed_points_callback)
@@ -28,7 +28,7 @@ class ObjectClassifier:
 
             # make prediction using loaded model
             prediction = self.model.predict(tf.expand_dims(points, axis=0), verbose=0)
-            if np.max(prediction) > 0.8:
+            if np.max(prediction) > 0.99:
                 prediction = np.argmax(prediction)
                 prediction = self.labels[prediction]
 
