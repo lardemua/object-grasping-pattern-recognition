@@ -1,7 +1,7 @@
 <launch>
     <arg name="input_image_topic" default="camera/color/image_raw"/>
 
-    <include file="$(find pamaral_object_grasping_pattern_recognition)/launch/mediapipe_preprocessing.launch">
+    <include file="$(find pamaral_object_grasping_pattern_recognition)/launch/mediapipe_processing.launch">
         <arg name="input_image_topic" value="$(arg input_image_topic)"/>
     </include>
 

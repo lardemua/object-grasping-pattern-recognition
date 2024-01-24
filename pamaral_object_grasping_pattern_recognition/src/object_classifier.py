@@ -26,14 +26,14 @@ class ObjectClassifier:
             points = [[p.x, p.y, p.z] for p in msg.points]
             points = np.array(points)
 
-            print(points.shape)
-
             # make prediction using loaded model
-            prediction = np.argmax(self.model.predict(tf.expand_dims(points, axis=0)))
-            prediction = self.labels[prediction]
+            prediction = self.model.predict(tf.expand_dims(points, axis=0), verbose=0)
+            if np.max(prediction) > 0.8:
+                prediction = np.argmax(prediction)
+                prediction = self.labels[prediction]
 
-            # publish prediction
-            self.object_class_pub.publish(prediction)
+                # publish prediction
+                self.object_class_pub.publish(prediction)
 
 
 def main():
