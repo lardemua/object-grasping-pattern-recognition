@@ -16,7 +16,7 @@ class KeypointsPreprocessing:
     def __init__(self):
         self.bridge = CvBridge()
         self.mp_points_image_publisher = rospy.Publisher("mp_points_image", Image, queue_size=1)
-        self.preprocessed_points_publisher = rospy.Publisher("preprocessed_points", PointList, queue_size=300)
+        self.preprocessed_points_publisher = rospy.Publisher("preprocessed_points", PointList, queue_size=1)
         self.mediapipe_results_sub = rospy.Subscriber("mediapipe_results", MediaPipeResults, self.mediapipe_results_callback)
 
     def mediapipe_results_callback(self, msg):
