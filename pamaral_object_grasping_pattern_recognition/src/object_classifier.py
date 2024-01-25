@@ -31,7 +31,7 @@ class ObjectClassifier:
             # make prediction using loaded model
             prediction1 = self.cnn_model.predict(tf.expand_dims(points, axis=0), verbose=0)
             prediction2 = self.transformer_model.predict(tf.expand_dims(points, axis=0), verbose=0)
-            if np.max(prediction1) > 0.999 and np.max(prediction2) > 0.999:
+            if np.max(prediction1) > 0.7 and np.max(prediction2) > 0.7:
                 prediction1 = np.argmax(prediction1)
                 prediction2 = np.argmax(prediction2)
 
