@@ -13,8 +13,10 @@ from pamaral_object_grasping_pattern_recognition.msg import PointList
 
 
 class ObjectClassifier:
-    def __init__(self, model_path):
-        self.model = tf.keras.models.load_model(model_path)
+    def __init__(self, cnn_model_path, transformer_model_path):
+        self.cnn_model = tf.keras.models.load_model(cnn_model_path)
+        self.transformer_model = tf.keras.models.load_model(transformer_model_path)
+        
         # self.labels = ["bottle", "cube", "phone", "screwdriver"]
         self.labels = ["ball", "bottle", "woodblock"]
 
@@ -27,22 +29,27 @@ class ObjectClassifier:
             points = np.array(points)
 
             # make prediction using loaded model
-            prediction = self.model.predict(tf.expand_dims(points, axis=0), verbose=0)
-            if np.max(prediction) > 0.99:
-                prediction = np.argmax(prediction)
-                prediction = self.labels[prediction]
+            prediction1 = self.cnn_model.predict(tf.expand_dims(points, axis=0), verbose=0)
+            prediction2 = self.transformer_model.predict(tf.expand_dims(points, axis=0), verbose=0)
+            if np.max(prediction1) > 0.999 and np.max(prediction2) > 0.999:
+                prediction1 = np.argmax(prediction1)
+                prediction2 = np.argmax(prediction2)
 
-                # publish prediction
-                self.object_class_pub.publish(prediction)
+                if prediction1 == prediction2:
+                    prediction = self.labels[prediction1]
+
+                    # publish prediction
+                    self.object_class_pub.publish(prediction)
 
 
 def main():
     default_node_name = 'object_classifier'
     rospy.init_node(default_node_name)
 
-    model_path = rospy.get_param(rospy.search_param('model_path'))
+    cnn_model_path = rospy.get_param(rospy.search_param('cnn_model_path'))
+    transformer_model_path = rospy.get_param(rospy.search_param('transformer_model_path'))
 
-    ObjectClassifier(model_path)
+    ObjectClassifier(cnn_model_path, transformer_model_path)
 
     rospy.spin()
     
