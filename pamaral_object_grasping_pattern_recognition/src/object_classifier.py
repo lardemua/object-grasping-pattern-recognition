@@ -40,6 +40,9 @@ class ObjectClassifier:
 
                     # publish prediction
                     self.object_class_pub.publish(prediction)
+                    return
+            
+            self.object_class_pub.publish("")
 
 
 def main():
