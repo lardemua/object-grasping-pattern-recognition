@@ -66,6 +66,11 @@ class HandsModelMediapipe:
                 
                 # Draw hand landmarks on the frame
                 self.mp_drawing.draw_landmarks(drawing, hand_landmarks, self.mp_hands.HAND_CONNECTIONS)
+            
+            #print(results.__dict__)
+            #for world_landmark in results.multi_hand_world_landmarks:
+                #for landmark in world_landmark.landmark:
+                    #print(landmark)
         
         # check if preempted
         if self.server.is_preempt_requested():

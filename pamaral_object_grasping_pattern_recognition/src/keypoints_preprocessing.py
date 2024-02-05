@@ -16,6 +16,7 @@ class KeypointsPreprocessing:
     def __init__(self):
         self.bridge = CvBridge()
         self.mp_points_image_publisher = rospy.Publisher("mp_points_image", Image, queue_size=1)
+        self.right_hand_keypoints_publisher = rospy.Publisher("right_hand_keypoints", PointList, queue_size=1)
         self.preprocessed_points_publisher = rospy.Publisher("preprocessed_points", PointList, queue_size=1)
         self.mediapipe_results_sub = rospy.Subscriber("mediapipe_results", MediaPipeResults, self.mediapipe_results_callback)
 
@@ -54,6 +55,16 @@ class KeypointsPreprocessing:
                     if right_hand_distance < best_distance:
                         points = hand
                         best_distance = right_hand_distance
+        
+        # publish the keypoints of the hand that is closer to the centroid of the right hand
+        msg = PointList()
+        msg.header.stamp = rospy.Time.now()
+        #msg.header.frame_id = self.input_topic
+        try:
+            msg.points = [Point(p[0], p[1], p[2]) for p in points]
+        except:
+            msg.points = []
+        self.right_hand_keypoints_publisher.publish(msg)
         
         if points is not None:
             centroid = np.average(points, axis=0)
