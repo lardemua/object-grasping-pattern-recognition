@@ -55,7 +55,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
-  MediaPipeResults.msg
+  MpHand.msg
+  MpPose.msg
+  MpResults.msg
   PointList.msg
 )
 
@@ -69,8 +71,8 @@ add_message_files(
 ## Generate actions in the 'action' folder
 add_action_files(
   FILES
-  HandsModel.action
-  PoseModel.action
+  MpHandsModel.action
+  MpPoseModel.action
 )
 
 ## Generate added messages and services with any dependencies listed here

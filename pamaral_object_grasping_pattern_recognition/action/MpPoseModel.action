@@ -2,7 +2,6 @@
 sensor_msgs/Image image
 ---
 # response message
-geometry_msgs/Point[] points
-std_msgs/String[] handednesses
+pamaral_object_grasping_pattern_recognition/MpPose pose
 ---
 # feedback message
