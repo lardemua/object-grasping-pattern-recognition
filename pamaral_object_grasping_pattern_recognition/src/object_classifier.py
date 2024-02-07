@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = ""  # set to empty string to force CPU usage
+# os.environ["CUDA_VISIBLE_DEVICES"] = ""  # set to empty string to force CPU usage
 
 import numpy as np
 import rospy
