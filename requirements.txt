@@ -2,4 +2,4 @@ matplotlib
 mediapipe
 numpy
 scikit-learn
-tensorflow[and-cuda] == 2.11
+tensorflow[and-cuda]
