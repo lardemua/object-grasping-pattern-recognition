@@ -7,7 +7,7 @@ import rospy
 from geometry_msgs.msg import Point
 from std_msgs.msg import String
 
-from pamaral_object_grasping_pattern_recognition.msg import MpResults, PointList
+from pamaral_object_grasping_pattern_recognition.msg import MpHand, MpPose, MpResults, PointList
 
 
 class DatasetKeypointsPreprocessing:
@@ -42,14 +42,13 @@ class DatasetKeypointsPreprocessing:
         
         else:
             # Save the data to a JSON file
+            rospy.loginfo("Saving {} to a JSON file".format(self.filenames[0]))
             with open(os.path.join(self.output_folder, self.filenames.pop(0)[:-5] + ".json"), 'a+') as file:
                 json.dump(self.data, file)
             
             self.read_next_json_file()
     
     def read_next_json_file(self):
-        print("This function needs to be reimplemented!")
-        """
         if len(self.filenames)>0:
             # Reset the data
             self.data = []
@@ -59,16 +58,21 @@ class DatasetKeypointsPreprocessing:
                 self.mediapipe_results = json.load(file)
             
             for i in range(len(self.mediapipe_results)):
-                self.mediapipe_results[i]['hands_keypoints'] = [Point(x=point[0], y=point[1], z=point[2]) for point in self.mediapipe_results[i]['hands_keypoints']]
-                self.mediapipe_results[i]['pose_keypoints'] = [Point(x=point[0], y=point[1], z=point[2]) for point in self.mediapipe_results[i]['pose_keypoints']]
-                self.mediapipe_results[i]['handednesses'] = [String(x) for x in self.mediapipe_results[i]['handednesses']]
+                for j in range(len(self.mediapipe_results[i]['hands'])):
+                    self.mediapipe_results[i]['hands'][j]['hand_landmarks'] = [Point(x=point[0], y=point[1], z=point[2]) for point in self.mediapipe_results[i]['hands'][j]['hand_landmarks']]
+                    self.mediapipe_results[i]['hands'][j]['hand_world_landmarks'] = [Point(x=point[0], y=point[1], z=point[2]) for point in self.mediapipe_results[i]['hands'][j]['hand_world_landmarks']]
+                    self.mediapipe_results[i]['hands'][j]['handedness'] = String(self.mediapipe_results[i]['hands'][j]['handedness'])
+                    self.mediapipe_results[i]['hands'][j] = MpHand(**self.mediapipe_results[i]['hands'][j])
+
+                self.mediapipe_results[i]['pose']['pose_landmarks'] = [Point(x=point[0], y=point[1], z=point[2]) for point in self.mediapipe_results[i]['pose']['pose_landmarks']]
+                self.mediapipe_results[i]['pose']['pose_world_landmarks'] = [Point(x=point[0], y=point[1], z=point[2]) for point in self.mediapipe_results[i]['pose']['pose_world_landmarks']]
+                self.mediapipe_results[i]['pose'] = MpPose(**self.mediapipe_results[i]['pose'])
 
             # Publish the 1st result
             self.mediapipe_results_publisher.publish(MpResults(**self.mediapipe_results.pop(0)))
 
         else:
             rospy.loginfo("All files processed")
-        """
 
 
 def main():
