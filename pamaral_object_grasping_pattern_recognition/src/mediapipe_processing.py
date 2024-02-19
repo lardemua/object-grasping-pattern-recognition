@@ -5,7 +5,7 @@ import rospy
 
 from sensor_msgs.msg import Image
 
-from pamaral_object_grasping_pattern_recognition.msg import MediaPipeResults, HandsModelAction, PoseModelAction, HandsModelGoal, PoseModelGoal
+from pamaral_object_grasping_pattern_recognition.msg import MpResults, MpHandsModelAction, MpPoseModelAction, MpHandsModelGoal, MpPoseModelGoal
 
 class MediaPipeProcessing:
 
@@ -13,33 +13,32 @@ class MediaPipeProcessing:
         self.input_topic = input_topic
 
         # Initialize Action Clients for MediaPipe Nodes
-        self.hands_model_client = actionlib.SimpleActionClient('hands_model', HandsModelAction)
-        self.pose_model_client = actionlib.SimpleActionClient('pose_model', PoseModelAction)
+        self.hands_model_client = actionlib.SimpleActionClient('hands_model', MpHandsModelAction)
+        self.pose_model_client = actionlib.SimpleActionClient('pose_model', MpPoseModelAction)
         self.hands_model_client.wait_for_server()
         self.pose_model_client.wait_for_server()
 
         # Initialize Publisher for MediaPipe Results
-        self.mediapipe_results_publisher = rospy.Publisher("mediapipe_results", MediaPipeResults, queue_size=1)
+        self.mediapipe_results_publisher = rospy.Publisher("mediapipe_results", MpResults, queue_size=1)
         
         # Initialize Subscriber for Input Images
         self.image_sub = rospy.Subscriber(input_topic, Image, self.image_callback)
 
     def image_callback(self, msg):
         # Send image to Mediapipe nodes
-        self.hands_model_client.send_goal(HandsModelGoal(image=msg))
-        self.pose_model_client.send_goal(PoseModelGoal(image=msg))
+        self.hands_model_client.send_goal(MpHandsModelGoal(image=msg))
+        self.pose_model_client.send_goal(MpPoseModelGoal(image=msg))
 
         # Wait for results
         self.hands_model_client.wait_for_result()
         self.pose_model_client.wait_for_result()
 
         # Get results
-        handednesses = self.hands_model_client.get_result().handednesses
-        hands_keypoints = self.hands_model_client.get_result().points
-        pose_keypoints = self.pose_model_client.get_result().points
+        hands = self.hands_model_client.get_result().hands
+        pose = self.pose_model_client.get_result().pose
 
         # Publish results
-        self.mediapipe_results_publisher.publish(handednesses=handednesses, hands_keypoints=hands_keypoints, pose_keypoints=pose_keypoints)
+        self.mediapipe_results_publisher.publish(hands=hands, pose=pose)
 
 
 def main():

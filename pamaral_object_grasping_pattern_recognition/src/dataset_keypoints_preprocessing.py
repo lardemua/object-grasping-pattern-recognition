@@ -7,7 +7,7 @@ import rospy
 from geometry_msgs.msg import Point
 from std_msgs.msg import String
 
-from pamaral_object_grasping_pattern_recognition.msg import MediaPipeResults, PointList
+from pamaral_object_grasping_pattern_recognition.msg import MpResults, PointList
 
 
 class DatasetKeypointsPreprocessing:
@@ -27,7 +27,7 @@ class DatasetKeypointsPreprocessing:
                 self.filenames.append(filename)
         
         # Create the MediaPipe Results Publisher        
-        self.mediapipe_results_publisher = rospy.Publisher("mediapipe_results", MediaPipeResults, queue_size=1)
+        self.mediapipe_results_publisher = rospy.Publisher("mediapipe_results", MpResults, queue_size=1)
         self.preprocessed_points_sub = rospy.Subscriber("preprocessed_points", PointList, self.preprocessed_points_callback)
 
     def preprocessed_points_callback(self, msg):
@@ -38,7 +38,7 @@ class DatasetKeypointsPreprocessing:
             self.data.append({'points': points})
 
         if len(self.mediapipe_results) > 0:
-            self.mediapipe_results_publisher.publish(MediaPipeResults(**self.mediapipe_results.pop(0)))
+            self.mediapipe_results_publisher.publish(MpResults(**self.mediapipe_results.pop(0)))
         
         else:
             # Save the data to a JSON file
@@ -48,6 +48,8 @@ class DatasetKeypointsPreprocessing:
             self.read_next_json_file()
     
     def read_next_json_file(self):
+        print("This function needs to be reimplemented!")
+        """
         if len(self.filenames)>0:
             # Reset the data
             self.data = []
@@ -62,10 +64,11 @@ class DatasetKeypointsPreprocessing:
                 self.mediapipe_results[i]['handednesses'] = [String(x) for x in self.mediapipe_results[i]['handednesses']]
 
             # Publish the 1st result
-            self.mediapipe_results_publisher.publish(MediaPipeResults(**self.mediapipe_results.pop(0)))
+            self.mediapipe_results_publisher.publish(MpResults(**self.mediapipe_results.pop(0)))
 
         else:
             rospy.loginfo("All files processed")
+        """
 
 
 def main():

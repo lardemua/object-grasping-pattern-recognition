@@ -2,6 +2,6 @@
 sensor_msgs/Image image
 ---
 # response message
-geometry_msgs/Point[] points
+pamaral_object_grasping_pattern_recognition/MpHand[] hands
 ---
 # feedback message

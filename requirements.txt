@@ -2,4 +2,4 @@ matplotlib
 mediapipe
 numpy
 scikit-learn
-tensorflow
+tensorflow[and-cuda]

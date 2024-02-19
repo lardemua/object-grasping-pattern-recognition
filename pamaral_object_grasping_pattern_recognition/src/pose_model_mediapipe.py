@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
+# set to empty string to force CPU usage
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = ""  # set to empty string to force CPU usage
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 import actionlib
 import cv2
@@ -10,20 +11,23 @@ import rospy
 
 from cv_bridge import CvBridge
 from geometry_msgs.msg import Point
+from mediapipe.tasks.python import BaseOptions
+from mediapipe.tasks.python.vision import PoseLandmarker, PoseLandmarkerOptions, RunningMode
 
-from pamaral_object_grasping_pattern_recognition.msg import PoseModelAction, PoseModelResult
+from pamaral_object_grasping_pattern_recognition.msg import MpPose, MpPoseModelAction, MpPoseModelResult
 
 
 class PoseModelMediapipe:
 
     def __init__(self):
-        # Initialize MediaPipe Pose
-        self.mp_pose = mp.solutions.pose
-        self.pose = self.mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.5, min_tracking_confidence=0.5)
+        # Initialize Pose Landmarker
+        base_options = BaseOptions(model_asset_path=f"{os.environ['HOME']}/catkin_ws/src/object_grasping_pattern_recognition/pamaral_object_grasping_pattern_recognition/models/pose_landmarker_heavy.task")
+        options = PoseLandmarkerOptions(base_options=base_options, running_mode=RunningMode.VIDEO)
+        self.pose_landmarker = PoseLandmarker.create_from_options(options)
 
         self.bridge = CvBridge()
 
-        self.server = actionlib.SimpleActionServer('pose_model', PoseModelAction, self.execute, False)
+        self.server = actionlib.SimpleActionServer('pose_model', MpPoseModelAction, self.execute, False)
         self.server.start()
 
         rospy.loginfo("Pose Detection Ready")
@@ -33,30 +37,36 @@ class PoseModelMediapipe:
             # Convert the ROS Image message to OpenCV image
             image = self.bridge.imgmsg_to_cv2(msg.image, "bgr8")
 
+            # Get the timestamp of the image in miliseconds
+            timestamp = msg.image.header.stamp
+            timestamp = int(timestamp.secs * 1000 + timestamp.nsecs / 1000000)
+
         except Exception as e:
             rospy.logerr(e)
             return
         
-        # Convert BGR image to RGB
-        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        # Convert BGR image to RGB and then to mediapipe image
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
-        # Process image with MediaPipe pose model
-        results = self.pose.process(image_rgb)
+        # Process image with MediaPipe pose model in video mode
+        results = self.pose_landmarker.detect_for_video(mp_image, timestamp)
 
-        points = []
+        pose = None
 
         # If the pose was detected, extract the coordinates of each landmark
-        if results.pose_landmarks:
-            for landmark in results.pose_landmarks.landmark:
-                points.append(Point(landmark.x, landmark.y, landmark.z))
-        
+        for pose_landmarks, pose_world_landmarks in zip(results.pose_landmarks, results.pose_world_landmarks):
+            pose_landmarks = [Point(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in pose_landmarks]
+            pose_world_landmarks = [Point(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in pose_world_landmarks]
+
+            pose = MpPose(pose_landmarks=pose_landmarks, pose_world_landmarks=pose_world_landmarks)
+
         # check if preempted
         if self.server.is_preempt_requested():
             self.server.set_preempted()
             return
         
         # return landmarks
-        res = PoseModelResult(points=points)
+        res = MpPoseModelResult(pose=pose)
         self.server.set_succeeded(res)
 
 

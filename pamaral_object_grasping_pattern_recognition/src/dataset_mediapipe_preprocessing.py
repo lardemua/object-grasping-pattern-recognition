@@ -7,7 +7,7 @@ import rospy
 
 from sensor_msgs.msg import Image
 
-from pamaral_object_grasping_pattern_recognition.msg import MediaPipeResults
+from pamaral_object_grasping_pattern_recognition.msg import MpResults
 
 
 class DatasetMediaPipePreprocessing:
@@ -28,9 +28,12 @@ class DatasetMediaPipePreprocessing:
         
         # Create the Image Publisher        
         self.image_publisher = rospy.Publisher(output_image_topic, Image, queue_size=1)
-        self.preprocessed_points_sub = rospy.Subscriber("mediapipe_results", MediaPipeResults, self.mediapipe_results_callback)
+        self.preprocessed_points_sub = rospy.Subscriber("mediapipe_results", MpResults, self.mediapipe_results_callback)
 
     def mediapipe_results_callback(self, msg):
+        print("This function needs to be reimplemented!")
+
+        """
         # Extract the data from the message
         handednesses = [h.data for h in msg.handednesses]
         hands_keypoints = [[p.x, p.y, p.z] for p in msg.hands_keypoints]
@@ -51,6 +54,7 @@ class DatasetMediaPipePreprocessing:
                 json.dump(self.data, file)
             
             self.read_next_bag_file()
+        """
     
     def read_next_bag_file(self):
         if len(self.filenames) > 0:
