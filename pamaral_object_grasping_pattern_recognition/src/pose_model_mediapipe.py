@@ -22,10 +22,12 @@ class PoseModelMediapipe:
     def __init__(self):
         # Initialize Pose Landmarker
         base_options = BaseOptions(model_asset_path=f"{os.environ['HOME']}/catkin_ws/src/object_grasping_pattern_recognition/pamaral_object_grasping_pattern_recognition/models/pose_landmarker_heavy.task")
-        options = PoseLandmarkerOptions(base_options=base_options, running_mode=RunningMode.VIDEO)
-        self.pose_landmarker = PoseLandmarker.create_from_options(options)
+        self.options = PoseLandmarkerOptions(base_options=base_options, running_mode=RunningMode.VIDEO)
+        self.pose_landmarker = None # PoseLandmarker.create_from_options(self.options)
 
         self.bridge = CvBridge()
+
+        self.last_ts = 0
 
         self.server = actionlib.SimpleActionServer('pose_model', MpPoseModelAction, self.execute, False)
         self.server.start()
@@ -44,6 +46,11 @@ class PoseModelMediapipe:
         except Exception as e:
             rospy.logerr(e)
             return
+
+        if timestamp < self.last_ts or timestamp - self.last_ts > 5000:
+            self.pose_landmarker = PoseLandmarker.create_from_options(self.options)
+        
+        self.last_ts = timestamp
         
         # Convert BGR image to RGB and then to mediapipe image
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=cv2.cvtColor(image, cv2.COLOR_BGR2RGB))

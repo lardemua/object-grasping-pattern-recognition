@@ -31,18 +31,24 @@ class DatasetMediaPipePreprocessing:
         self.preprocessed_points_sub = rospy.Subscriber("mediapipe_results", MpResults, self.mediapipe_results_callback)
 
     def mediapipe_results_callback(self, msg):
-        print("This function needs to be reimplemented!")
-
-        """
         # Extract the data from the message
-        handednesses = [h.data for h in msg.handednesses]
-        hands_keypoints = [[p.x, p.y, p.z] for p in msg.hands_keypoints]
-        pose_keypoints = [[p.x, p.y, p.z] for p in msg.pose_keypoints]
+        hands = [{
+            'handedness': h.handedness.data,
+            "hand_landmarks": [[p.x, p.y, p.z] for p in h.hand_landmarks],
+            "hand_world_landmarks": [[p.x, p.y, p.z] for p in h.hand_world_landmarks]
+        } for h in msg.hands]
+
+        if msg.pose is not None:
+            pose = {
+                "pose_landmarks": [[p.x, p.y, p.z] for p in msg.pose.pose_landmarks],
+                "pose_world_landmarks": [[p.x, p.y, p.z] for p in msg.pose.pose_world_landmarks]
+            }
+        else:
+            pose = None
 
         self.data.append({
-            'handednesses': handednesses,
-            'hands_keypoints': hands_keypoints,
-            'pose_keypoints': pose_keypoints
+            'hands': hands,
+            'pose': pose
         })
 
         if len(self.messages) > 0:
@@ -50,11 +56,11 @@ class DatasetMediaPipePreprocessing:
         
         else:
             # Save the data to a JSON file
+            rospy.loginfo("Saving {} to a JSON file".format(self.filenames[0]))
             with open(os.path.join(self.output_folder, self.filenames.pop(0)[:-4] + ".json"), 'a+') as file:
                 json.dump(self.data, file)
             
             self.read_next_bag_file()
-        """
     
     def read_next_bag_file(self):
         if len(self.filenames) > 0:
@@ -63,7 +69,12 @@ class DatasetMediaPipePreprocessing:
 
             # Read the bag file
             bag = rosbag.Bag(os.path.join(self.input_folder, self.filenames[0]))
-            self.messages = [x[1] for x in bag.read_messages()]
+            msgs = bag.read_messages()
+
+            # Sort the messages by publication timestamp
+            msgs = sorted(msgs, key=lambda x: x[1].header.stamp.secs * 1e9 + x[1].header.stamp.nsecs)
+            
+            self.messages = [x[1] for x in msgs]
 
             # Publish 1st message
             self.image_publisher.publish(self.messages.pop(0))

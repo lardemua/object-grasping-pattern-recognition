@@ -25,12 +25,14 @@ class HandsModelMediapipe:
     def __init__(self):
         # Initialize Hand Landmarker
         base_options = BaseOptions(model_asset_path=f"{os.environ['HOME']}/catkin_ws/src/object_grasping_pattern_recognition/pamaral_object_grasping_pattern_recognition/models/hand_landmarker.task")
-        options = HandLandmarkerOptions(base_options=base_options, running_mode=RunningMode.VIDEO, num_hands=2)
-        self.hand_landmarker = HandLandmarker.create_from_options(options)
+        self.options = HandLandmarkerOptions(base_options=base_options, running_mode=RunningMode.VIDEO, num_hands=2)
+        self.hand_landmarker = None # HandLandmarker.create_from_options(self.options)
 
         self.bridge = CvBridge()
 
         self.mp_drawing_publisher = rospy.Publisher("mp_drawing", Image, queue_size=1)
+
+        self.last_ts = 0
 
         self.server = actionlib.SimpleActionServer('hands_model', MpHandsModelAction, self.execute, False)
         self.server.start()
@@ -84,6 +86,11 @@ class HandsModelMediapipe:
         except Exception as e:
             rospy.logerr(e)
             return
+        
+        if timestamp < self.last_ts or timestamp - self.last_ts > 5000:
+            self.hand_landmarker = HandLandmarker.create_from_options(self.options)
+        
+        self.last_ts = timestamp
         
         drawing = image.copy()
 
