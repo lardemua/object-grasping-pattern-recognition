@@ -47,6 +47,10 @@ Object Recognition using the Object's Grasping Pattern
 
 ### Record Data as Bag Files
 
+```
+roslaunch pamaral_object_grasping_pattern_recognition dataset_recording.launch
+```
+
 ### Extract MediaPipe Data from Bag Files
 
 ```
@@ -60,3 +64,15 @@ roslaunch pamaral_object_grasping_pattern_recognition dataset_keypoints_preproce
 ```
 
 ### Train Model
+
+```
+cd model_training
+python3 cnn_main.py
+```
+
+or 
+
+```
+cd model_training
+python3 transformer_main.py
+```

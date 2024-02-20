@@ -10,7 +10,7 @@
         <arg name="input_image_topic" value="mediapipe_camera/color/image_raw"/>
     </include>
 
-    <node name="record_dataset" pkg="pamaral_object_grasping_pattern_recognition" type="record_dataset.py" output="screen">
+    <node name="dataset_recording" pkg="pamaral_object_grasping_pattern_recognition" type="dataset_recording.py" output="screen">
         <param name="output_folder" value="$(find data)/bag_files"/>
     </node>
 

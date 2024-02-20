@@ -13,4 +13,8 @@
 
     <!-- Test -->
     <node name="test_node" pkg="larcc_antecipative_object_handover" type="object_recognition_pipeline_test.py" output="screen"/>
+
+    <!-- RViz -->
+    <node name="rviz" pkg="rviz" type="rviz"
+          args="--display-config $(find pamaral_object_grasping_pattern_recognition)/config/rviz.rviz" required="false"/>
 </launch>
