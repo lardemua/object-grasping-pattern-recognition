@@ -13,7 +13,7 @@ N_CLASSES = 4
 
 if __name__ == "__main__":
     # read data
-    x, y = read_dataset2()
+    x, y = read_dataset()
 
     x = x.reshape(x.shape[0], x.shape[1]*x.shape[2])
 

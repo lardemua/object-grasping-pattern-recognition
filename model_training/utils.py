@@ -14,7 +14,7 @@ plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.size'] = 15
 
 
-def read_dataset_3objects(folder_path="./preprocessed_dataset", objects=["bottle", "cube", "phone", "screwdriver"],
+def read_dataset(folder_path="./preprocessed_dataset", objects=["bottle", "cube", "phone", "screwdriver"],
                   people=["joel", "manuel", "pedro"], sessions=["1", "2", "3", "4"], num_samples=None):
     x = []
     y = []

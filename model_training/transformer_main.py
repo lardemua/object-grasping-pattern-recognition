@@ -1,7 +1,6 @@
 import numpy as np
-# import os
-# import random
 import tensorflow as tf
+import time
 
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
@@ -11,7 +10,7 @@ from tensorflow.keras import layers
 from utils import *
 
 
-N_CLASSES = 3
+CLASSES = ["bottle", "cube", "phone", "screwdriver"]
 
 
 # model creation functions
@@ -52,7 +51,7 @@ def build_model(
     for dim in mlp_units:
         x = layers.Dense(dim, activation="relu")(x)
         x = layers.Dropout(mlp_dropout)(x)
-    outputs = layers.Dense(N_CLASSES, activation="softmax")(x)
+    outputs = layers.Dense(len(CLASSES), activation="softmax")(x)
     return keras.Model(inputs, outputs)
 
 
@@ -78,24 +77,18 @@ def create_model(input_shape, mlp_dropout=0.1, dropout=0.5, learning_rate=0.0001
 
 
 if __name__ == "__main__":
-    # make more reproducible results, GPU does not allow full reproducibility
-    # os.environ["PYTHONHASHSEED"] = "0"
-    # random.seed(1234)
-    # np.random.seed(1234)
-    # tf.random.set_seed(1234)
-
     # read data
-    x, y = read_dataset_3objects()
+    x, y = read_dataset(objects=CLASSES)
 
     input_shape = x.shape[1:]
 
     # data shuffling
-    x, y = shuffle(x, y, random_state=0)
+    x, y = shuffle(x, y)
 
     # data splitting
-    x_temp, x_test, y_temp, y_test = train_test_split(x, y, test_size=1/5, random_state=0, stratify=y)
+    x_temp, x_test, y_temp, y_test = train_test_split(x, y, test_size=1/5, stratify=y)
 
-    x_train, x_val, y_train, y_val = train_test_split(x_temp, y_temp, test_size=1/4, random_state=0, stratify=y_temp, shuffle=True)
+    x_train, x_val, y_train, y_val = train_test_split(x_temp, y_temp, test_size=1/4, stratify=y_temp, shuffle=True)
 
     # model training and evaluation
     model = create_model(input_shape)
@@ -110,6 +103,7 @@ if __name__ == "__main__":
         )
     ]
 
+    start_time = time.time()
     results = model.fit(
         x_train,
         y_train,
@@ -118,6 +112,7 @@ if __name__ == "__main__":
         batch_size=256,
         callbacks=callbacks,
     )
+    t = time.time() - start_time
 
     l, a = model.evaluate(x_val, y_val, verbose=1)
 
@@ -137,10 +132,11 @@ if __name__ == "__main__":
 
     y_pred=np.argmax(model.predict(x_test), axis=-1)
 
-    plot_confusion_matrix(confusion_matrix(y_test, y_pred), ["bottle", "cube", "phone", "screw."],
+    plot_confusion_matrix(confusion_matrix(y_test, y_pred), [o if len(o) <=6 else f"{o[:5]}." for o in CLASSES],
                         show=False, save_path = "./results/transformer_conf_matrix.svg")
 
     write_results(results.history['sparse_categorical_accuracy'][-200], a, A,
                 results.history['loss'][-200], l, L,
                 classification_report(y_pred,y_test, digits=4),
+                training_time=t,
                 save_path = "./results/transformer_results.txt")

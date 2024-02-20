@@ -23,7 +23,7 @@ def test_conv_1d(train_users, train_sessions, test_users=None, test_sessions=Non
 
     for _ in range(n_simulations):
         # read data
-        x_train, y_train = read_dataset2(sessions=train_sessions, people=train_users)
+        x_train, y_train = read_dataset(sessions=train_sessions, people=train_users)
 
         input_shape = x_train.shape[1:]
 
@@ -34,7 +34,7 @@ def test_conv_1d(train_users, train_sessions, test_users=None, test_sessions=Non
         if test_users is None and test_sessions is None:
             x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, test_size=1/5, stratify=y_train, shuffle=True)
         elif test_users is not None and test_sessions is not None:
-            x_test, y_test = read_dataset2(sessions=test_sessions, people=test_users)
+            x_test, y_test = read_dataset(sessions=test_sessions, people=test_users)
         else:
             raise ValueError("test_users and test_sessions must be both None or not None")
         

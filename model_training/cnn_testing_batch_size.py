@@ -20,7 +20,7 @@ tf.random.set_seed(1234)
 
 if __name__ == "__main__":
     # read data
-    x, y = read_dataset2()
+    x, y = read_dataset()
 
     input_shape = x.shape[1:]
 
