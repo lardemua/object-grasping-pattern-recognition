@@ -10,7 +10,8 @@ from tensorflow import keras
 from utils import *
 
 
-CLASSES = ["bottle", "cube", "phone", "screwdriver"]
+# CLASSES = ["bottle", "cube", "phone", "screwdriver"]
+CLASSES = ["ball", "bottle", "woodblock"]
 
 
 # create new model function 
