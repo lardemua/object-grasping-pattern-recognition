@@ -1,29 +1,32 @@
+import json
 import os
 
 # Specify the folder path you want to read files from
-folder_path = "./dataset_after_preprocessing"
+folder_path = "./preprocessed_dataset"
 
 counts = dict()
 overall = 0
 
 # Check if the folder path exists
 if os.path.exists(folder_path) and os.path.isdir(folder_path):
-    # List all files in the folder
-    file_list = os.listdir(folder_path)
+    # Iterate over all files in the folder
+    for filename in sorted(os.listdir(folder_path)):
+        # Create the absolute path to the file
+        file_path = os.path.join(folder_path, filename)
 
-    # Iterate through the files and print their names
-    for file_name in sorted(file_list):
-        file_path = os.path.join(folder_path, file_name)
-        if os.path.isfile(file_path):
-            f = open(file_path, "r")
-            count = len(f.readlines())
-            f.close()
+        # Check if the file path is a file (not a directory)
+        if os.path.isfile(file_path) and file_path.endswith(".json"):
+            with open(file_path, "r") as f:
+                data = json.load(f)
+            
+            count = len(data)
             
             overall += count
 
-            file_name = file_name.split("_")
-            object_name = file_name[0]
-            participant_name = file_name[1]
+            filename = filename.split("_")
+            object_name = filename[0]
+            participant_name = filename[1]
+            session = filename[2][0]
 
             if object_name not in counts:
                 counts[object_name] = dict()
