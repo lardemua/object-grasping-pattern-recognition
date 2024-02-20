@@ -19,7 +19,7 @@ def read_dataset_3objects(folder_path="./preprocessed_dataset", objects=["ball",
     x = []
     y = []
 
-    object_ids = {"ball":0, "bottle":1, "woodblock":2}
+    object_ids = {o: objects.index(o) for o in objects}
 
     # Iterate over all files in the folder
     for filename in os.listdir(folder_path):
@@ -54,93 +54,13 @@ def read_dataset_3objects(folder_path="./preprocessed_dataset", objects=["ball",
     return x, y
 
 
-def read_dataset1(folder_path="./dataset_after_preprocessing"):
-    x = []
-    y = []
-
-    
-    f = open(os.path.join(folder_path, "12_06_2023_14_27_16.csv"), "r")
-
-    for line in f.readlines():
-        ps = [[aux for aux in p[1:-2].split(" ") if len(aux)>0] for p in line.split(",")]
-        x.append([[float(p[0]), float(p[1]), float(p[2])] for p in ps])
-        y.append(0)
-
-    f.close()
-
-    f = open(os.path.join(folder_path, "12_06_2023_14_30_18.csv"), "r")
-
-    for line in f.readlines():
-        ps = [[aux for aux in p[1:-2].split(" ") if len(aux)>0] for p in line.split(",")]
-        x.append([[float(p[0]), float(p[1]), float(p[2])] for p in ps])
-        y.append(1)
-
-    f.close()
-
-    f = open(os.path.join(folder_path, "12_06_2023_15_14_35.csv"), "r")
-
-    for line in f.readlines():
-        ps = [[aux for aux in p[1:-2].split(" ") if len(aux)>0] for p in line.split(",")]
-        x.append([[float(p[0]), float(p[1]), float(p[2])] for p in ps])
-        y.append(2)
-
-    f.close()
-
-    x = np.array(x)
-    y = np.array(y)
-
-    return x, y
-
-
-def read_dataset2(folder_path="./dataset_after_preprocessing", objects=["bottle", "cube", "phone", "screwdriver"],
-                  people=["joel", "manuel", "pedro"], sessions=["1", "2", "3", "4"], num_samples=None):
-    x = []
-    y = []
-
-    object_ids = {"bottle":0, "cube":1, "phone":2, "screwdriver":3}
-
-    # Iterate over all files in the folder
-    for filename in os.listdir(folder_path):
-        # Create the absolute path to the file
-        file_path = os.path.join(folder_path, filename)
-
-        # Check if the file path is a file (not a directory)
-        if os.path.isfile(file_path) and file_path.endswith(".csv"):
-            filename = filename.split("_")
-            object_name = filename[0]
-            person = filename[1]
-            session = filename[2][0]
-
-            if object_name in objects and person in people and session in sessions:
-                # Open the file
-                f = open(file_path, "r")
-
-                for line in f.readlines():
-                    ps = [[aux for aux in p[1:-2].split(" ") if len(aux)>0] for p in line.split(",")]
-                    x.append([[float(p[0]), float(p[1]), float(p[2])] for p in ps])
-                    y.append(object_ids[object_name])
-
-                f.close()
-    
-    x = np.array(x)
-    y = np.array(y)
-    
-    if num_samples is not None:
-        random_indices = np.random.choice(len(y), size=num_samples, replace=False)
-
-        x = x[random_indices]
-        y = y[random_indices]
-
-    return x, y
-
-
 def write_results(train_acc, val_acc, test_acc, train_loss, val_loss, test_loss,
         report, training_time="", save_path="./results/results.txt"):
     
     f = open(save_path, "w")
     f.write(f"Training loss: {train_loss}\nTraining accuracy: {train_acc}\n")
     f.write(f"Validation loss: {val_loss}\nValidation accuracy: {val_acc}\n")
-    f.write(f"Test loss: {test_loss}\nTest accuracy: {test_acc}\n")
+    f.write(f"Test loss: {test_loss}\nTest accuracy: {test_acc}\n\n")
     f.write(report)
     f.write(f"\nTraining time: {training_time} seconds\n")
     f.close()
