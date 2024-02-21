@@ -8,7 +8,7 @@ from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
 from std_msgs.msg import String
 
-from pamaral_object_grasping_pattern_recognition.msg import MpResults
+from pamaral_object_grasping_pattern_recognition.msg import MpResults, PointList
 
 
 class DataVisualization:
@@ -28,10 +28,12 @@ class DataVisualization:
         self.bridge = CvBridge()
 
         self.mp_drawing_publisher = rospy.Publisher("mp_drawing", Image, queue_size=1)
+        self.mp_points_image_publisher = rospy.Publisher("mp_points_image", Image, queue_size=1)
 
         self.object_class_sub = rospy.Subscriber("object_class", String, self.object_class_callback)
         self.image_sub = rospy.Subscriber(input_topic, Image, self.image_callback)
         self.mediapipe_results_sub = rospy.Subscriber("mediapipe_results", MpResults, self.mediapipe_results_callback)
+        self.preprocessed_points_sub = rospy.Subscriber("preprocessed_points", PointList, self.preprocessed_points_callback)
     
     def object_class_callback(self, msg):
         self.object_class = msg.data
@@ -68,6 +70,19 @@ class DataVisualization:
 
         # Publish the frame with the hand landmarks
         self.mp_drawing_publisher.publish(self.bridge.cv2_to_imgmsg(image, "bgr8"))
+    
+    def preprocessed_points_callback(self, msg):
+        image = np.zeros((480, 640, 3), dtype=np.uint8)
+
+        points = [[p.x, p.y, p.z] for p in msg.points]
+
+        if len(points) > 0:
+            image = self.draw_hand_points(image, points)
+        
+        cv2.putText(image, self.object_class, (20, 100), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 128), 5)
+
+        # Publish the frame with the hand landmarks
+        self.mp_points_image_publisher.publish(self.bridge.cv2_to_imgmsg(image, "bgr8"))
 
     def draw_hand_points(self, drawing, hand_landmarks):
         # Define the polygon vertices
