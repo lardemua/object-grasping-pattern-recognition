@@ -21,7 +21,7 @@ class PoseModelMediapipe:
 
     def __init__(self):
         # Initialize Pose Landmarker
-        base_options = BaseOptions(model_asset_path=f"{os.environ['HOME']}/catkin_ws/src/object_grasping_pattern_recognition/pamaral_object_grasping_pattern_recognition/models/pose_landmarker_heavy.task")
+        base_options = BaseOptions(model_asset_path=f"{os.environ['HOME']}/catkin_ws/src/object_grasping_pattern_recognition/pamaral_object_grasping_pattern_recognition/models/pose_landmarker_full.task")
         self.options = PoseLandmarkerOptions(base_options=base_options, running_mode=RunningMode.VIDEO)
         self.pose_landmarker = None # PoseLandmarker.create_from_options(self.options)
 

@@ -1,3 +1,4 @@
 std_msgs/Header header
 pamaral_object_grasping_pattern_recognition/MpHand[] hands
 pamaral_object_grasping_pattern_recognition/MpPose pose
+std_msgs/UInt32 image_seq

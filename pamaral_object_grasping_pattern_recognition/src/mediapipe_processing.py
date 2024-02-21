@@ -4,6 +4,7 @@ import actionlib
 import rospy
 
 from sensor_msgs.msg import Image
+from std_msgs.msg import UInt32
 
 from pamaral_object_grasping_pattern_recognition.msg import MpResults, MpHandsModelAction, MpPoseModelAction, MpHandsModelGoal, MpPoseModelGoal
 
@@ -22,23 +23,30 @@ class MediaPipeProcessing:
         self.mediapipe_results_publisher = rospy.Publisher("mediapipe_results", MpResults, queue_size=1)
         
         # Initialize Subscriber for Input Images
+        self.last_msg = None
         self.image_sub = rospy.Subscriber(input_topic, Image, self.image_callback)
 
     def image_callback(self, msg):
-        # Send image to Mediapipe nodes
-        self.hands_model_client.send_goal(MpHandsModelGoal(image=msg))
-        self.pose_model_client.send_goal(MpPoseModelGoal(image=msg))
+        self.last_msg = msg
+    
+    def process_image(self):
+        if self.last_msg is not None:
+            msg = self.last_msg
 
-        # Wait for results
-        self.hands_model_client.wait_for_result()
-        self.pose_model_client.wait_for_result()
+            # Send image to Mediapipe nodes
+            self.hands_model_client.send_goal(MpHandsModelGoal(image=msg))
+            self.pose_model_client.send_goal(MpPoseModelGoal(image=msg))
 
-        # Get results
-        hands = self.hands_model_client.get_result().hands
-        pose = self.pose_model_client.get_result().pose
+            # Wait for results
+            self.hands_model_client.wait_for_result()
+            self.pose_model_client.wait_for_result()
 
-        # Publish results
-        self.mediapipe_results_publisher.publish(hands=hands, pose=pose)
+            # Get results
+            hands = self.hands_model_client.get_result().hands
+            pose = self.pose_model_client.get_result().pose
+
+            # Publish results
+            self.mediapipe_results_publisher.publish(hands=hands, pose=pose, image_seq = UInt32(msg.header.seq))
 
 
 def main():
@@ -47,7 +55,10 @@ def main():
 
     input_topic = rospy.get_param(rospy.search_param('input_image_topic'))
 
-    MediaPipeProcessing(input_topic=input_topic)
+    mediapipe_processing = MediaPipeProcessing(input_topic=input_topic)
+
+    while not rospy.is_shutdown():
+        mediapipe_processing.process_image()
 
     rospy.spin()
 

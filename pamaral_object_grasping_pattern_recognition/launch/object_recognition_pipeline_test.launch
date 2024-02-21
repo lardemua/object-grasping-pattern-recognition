@@ -11,8 +11,13 @@
         <arg name="input_image_topic" value="mediapipe_camera/color/image_raw"/>
     </include>
 
+    <!-- Visualization -->
+    <node name="data_visualization" pkg="pamaral_object_grasping_pattern_recognition" type="data_visualization.py" output="screen">
+        <param name="input_image_topic" value="mediapipe_camera/color/image_raw"/>
+    </node>
+
     <!-- Test -->
-    <node name="test_node" pkg="larcc_antecipative_object_handover" type="object_recognition_pipeline_test.py" output="screen"/>
+    <!-- <node name="test_node" pkg="pamaral_object_grasping_pattern_recognition" type="object_recognition_pipeline_test.py" output="screen"/> -->
 
     <!-- RViz -->
     <node name="rviz" pkg="rviz" type="rviz"
