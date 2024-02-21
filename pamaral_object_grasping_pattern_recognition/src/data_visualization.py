@@ -17,6 +17,11 @@ class DataVisualization:
     """
 
     def __init__(self, input_topic):
+        # Drawing Constants
+        self.lines = [[0, 1], [1, 2], [2, 3], [3, 4], [0, 5], [5, 6], [6, 7], [7, 8],
+                    [5, 9], [9, 10], [10, 11], [11, 12], [9, 13], [13, 14], [14, 15],
+                    [15, 16], [0, 17], [17, 18], [18, 19], [19, 20], [13, 17]]
+        
         self.object_class = ""
         self.last_image_msgs = []
 
@@ -65,13 +70,6 @@ class DataVisualization:
         self.mp_drawing_publisher.publish(self.bridge.cv2_to_imgmsg(image, "bgr8"))
 
     def draw_hand_points(self, drawing, hand_landmarks):
-        # Draw the points on the image
-        point_radius = 8
-
-        lines = [[0, 1], [1, 2], [2, 3], [3, 4], [0, 5], [5, 6], [6, 7], [7, 8],
-                    [5, 9], [9, 10], [10, 11], [11, 12], [9, 13], [13, 14], [14, 15],
-                    [15, 16], [0, 17], [17, 18], [18, 19], [19, 20], [13, 17]]
-        
         # Define the polygon vertices
         polygon_points = np.array([hand_landmarks[0][:2], hand_landmarks[5][:2], hand_landmarks[9][:2], hand_landmarks[13][:2], hand_landmarks[17][:2]])
 
@@ -83,17 +81,14 @@ class DataVisualization:
         # Reshape the points array into shape compatible with fillPoly
         polygon_points = polygon_points.reshape((-1, 1, 2))
 
-        # Specify the color for the polygon (in BGR format)
-        polygon_color = (0, 64, 0) # Dark green
-
         # Fill the polygon with the specified color
-        cv2.fillPoly(drawing, [polygon_points], polygon_color)
+        cv2.fillPoly(drawing, [polygon_points], (0, 64, 0))
         
-        for p1, p2 in lines:
-            cv2.line(drawing, [int(hand_landmarks[p1][0]*640), int(hand_landmarks[p1][1]*480)], [int(hand_landmarks[p2][0]*640), int(hand_landmarks[p2][1]*480)], [0, 255, 0], 2)
+        for p1, p2 in self.lines:
+            cv2.line(drawing, (int(hand_landmarks[p1][0]*640), int(hand_landmarks[p1][1]*480)), (int(hand_landmarks[p2][0]*640), int(hand_landmarks[p2][1]*480)), (0, 255, 0), 2)
 
         for point in hand_landmarks:
-            cv2.circle(drawing, [int(point[0]*640), int(point[1]*480)], point_radius, [0,0,255], -1)
+            cv2.circle(drawing, (int(point[0]*640), int(point[1]*480)), 8, (0,0,255), -1)
         
         return drawing
 
