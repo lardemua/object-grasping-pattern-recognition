@@ -17,7 +17,7 @@
     </node>
 
     <!-- Test -->
-    <!-- <node name="test_node" pkg="pamaral_object_grasping_pattern_recognition" type="object_recognition_pipeline_test.py" output="screen"/> -->
+    <node name="test_node" pkg="pamaral_object_grasping_pattern_recognition" type="object_recognition_pipeline_test.py" output="screen"/>
 
     <!-- RViz -->
     <node name="rviz" pkg="rviz" type="rviz"

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-# os.environ["CUDA_VISIBLE_DEVICES"] = ""  # set to empty string to force CPU usage
+os.environ["CUDA_VISIBLE_DEVICES"] = ""  # set to empty string to force CPU usage
 
 import numpy as np
 import rospy
@@ -17,32 +17,51 @@ class ObjectClassifier:
         self.cnn_model = tf.keras.models.load_model(cnn_model_path)
         self.transformer_model = tf.keras.models.load_model(transformer_model_path)
         
-        # self.labels = ["bottle", "cube", "phone", "screwdriver"]
-        self.labels = ["ball", "bottle", "woodblock"]
+        self.labels = ["bottle", "cube", "phone", "screwdriver"]
+        #self.labels = ["ball", "bottle", "woodblock"]
+
+        self.preprocessed_points = None
 
         self.object_class_pub = rospy.Publisher("object_class", String, queue_size=1)
         self.preprocessed_points_sub = rospy.Subscriber("preprocessed_points", PointList, self.preprocessed_points_callback)
 
     def preprocessed_points_callback(self, msg):
-        if len(msg.points)>0:
-            points = [[p.x, p.y, p.z] for p in msg.points]
-            points = np.array(points)
+        self.preprocessed_points = msg.points
 
-            # make prediction using loaded model
-            prediction1 = self.cnn_model.predict(tf.expand_dims(points, axis=0), verbose=0)
-            prediction2 = self.transformer_model.predict(tf.expand_dims(points, axis=0), verbose=0)
-            if np.max(prediction1) > 0.7 and np.max(prediction2) > 0.7:
-                prediction1 = np.argmax(prediction1)
-                prediction2 = np.argmax(prediction2)
+    def preprocessed_points_processing(self):
+        rate = rospy.Rate(10)
 
-                if prediction1 == prediction2:
-                    prediction = self.labels[prediction1]
+        while not rospy.is_shutdown():
+            if self.preprocessed_points is not None:
+                if len(self.preprocessed_points)>0:
+                    points = [[p.x, p.y, p.z] for p in self.preprocessed_points]
+                    points = np.array(points)
 
-                    # publish prediction
-                    self.object_class_pub.publish(prediction)
-                    return
-            
-            self.object_class_pub.publish("")
+                    # make prediction using loaded model
+                    prediction1 = self.cnn_model.predict(tf.expand_dims(points, axis=0), verbose=0)
+                    prediction2 = prediction1
+                    #prediction2 = self.transformer_model.predict(tf.expand_dims(points, axis=0), verbose=0)
+                    if np.max(prediction1) > 0.7 and np.max(prediction2) > 0.7:
+                        prediction1 = np.argmax(prediction1)
+                        prediction2 = np.argmax(prediction2)
+
+                        if prediction1 == prediction2:
+                            prediction = self.labels[prediction1]
+
+                            # publish prediction
+                            self.object_class_pub.publish(prediction)
+
+                        else:
+                            self.object_class_pub.publish("")
+                    
+                    else:
+                        self.object_class_pub.publish("")
+                
+                else:
+                    self.object_class_pub.publish("")
+                
+
+            rate.sleep()
 
 
 def main():
@@ -52,7 +71,9 @@ def main():
     cnn_model_path = rospy.get_param(rospy.search_param('cnn_model_path'))
     transformer_model_path = rospy.get_param(rospy.search_param('transformer_model_path'))
 
-    ObjectClassifier(cnn_model_path, transformer_model_path)
+    object_classifier = ObjectClassifier(cnn_model_path, transformer_model_path)
+
+    object_classifier.preprocessed_points_processing()
 
     rospy.spin()
     

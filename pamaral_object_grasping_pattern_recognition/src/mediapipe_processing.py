@@ -23,17 +23,17 @@ class MediaPipeProcessing:
         self.mediapipe_results_publisher = rospy.Publisher("mediapipe_results", MpResults, queue_size=1)
         
         # Initialize Subscriber for Input Images
-        self.has_new_msg = False
-        self.last_msg = None
+        self.image = None
         self.image_sub = rospy.Subscriber(input_topic, Image, self.image_callback)
 
     def image_callback(self, msg):
-        self.last_msg, self.has_new_msg = msg, True
+        self.image = msg
     
-    def process_image(self):
-        while True:
-            if self.has_new_msg:
-                msg, self.has_new_msg = self.last_msg, False
+    def image_processing_loop(self):
+        rate = rospy.Rate(20)
+        while not rospy.is_shutdown():
+            if self.image is not None:
+                msg = self.image
 
                 # Send image to Mediapipe nodes
                 self.hands_model_client.send_goal(MpHandsModelGoal(image=msg))
@@ -49,6 +49,8 @@ class MediaPipeProcessing:
 
                 # Publish results
                 self.mediapipe_results_publisher.publish(hands=hands, pose=pose, image_seq = UInt32(msg.header.seq))
+            
+            rate.sleep()
 
 
 def main():
@@ -59,7 +61,7 @@ def main():
 
     mediapipe_processing = MediaPipeProcessing(input_topic=input_topic)
 
-    mediapipe_processing.process_image()
+    mediapipe_processing.image_processing_loop()
 
     rospy.spin()
 

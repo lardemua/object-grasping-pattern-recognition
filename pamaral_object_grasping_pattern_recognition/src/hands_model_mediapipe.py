@@ -41,14 +41,13 @@ class HandsModelMediapipe:
             image = self.bridge.imgmsg_to_cv2(msg.image, "bgr8")
 
             # Get the timestamp of the image in miliseconds
-            timestamp = msg.image.header.stamp
-            timestamp = int(timestamp.secs * 1000 + timestamp.nsecs / 1000000)
+            timestamp = int(msg.image.header.stamp.to_sec()*1000)
 
         except Exception as e:
             rospy.logerr(e)
             return
         
-        if timestamp < self.last_ts or timestamp - self.last_ts > 5000:
+        if timestamp < self.last_ts or timestamp - self.last_ts > 2000:
             self.hand_landmarker = HandLandmarker.create_from_options(self.options)
         
         self.last_ts = timestamp
