@@ -10,8 +10,8 @@ from tensorflow import keras
 from utils import *
 
 
-# CLASSES = ["bottle", "cube", "phone", "screwdriver"]
-CLASSES = ["ball", "bottle", "woodblock"]
+CLASSES = ["bottle", "cube", "phone", "screwdriver"]
+#CLASSES = ["ball", "bottle", "woodblock"]
 
 
 # create new model function 
@@ -39,7 +39,7 @@ def create_model(input_shape, dropout=0.5, learning_rate=0.001, kernel_size=3, n
 
 if __name__ == "__main__":
     # read data
-    x, y = read_dataset(objects=CLASSES)
+    x, y = read_dataset(objects=CLASSES, people=["pedro"])
 
     input_shape = x.shape[1:]
 

@@ -10,8 +10,8 @@ from tensorflow.keras import layers
 from utils import *
 
 
-# CLASSES = ["bottle", "cube", "phone", "screwdriver"]
-CLASSES = ["ball", "bottle", "woodblock"]
+CLASSES = ["bottle", "cube", "phone", "screwdriver"]
+# CLASSES = ["ball", "bottle", "woodblock"]
 
 
 # model creation functions
@@ -79,7 +79,7 @@ def create_model(input_shape, mlp_dropout=0.1, dropout=0.5, learning_rate=0.0001
 
 if __name__ == "__main__":
     # read data
-    x, y = read_dataset(objects=CLASSES)
+    x, y = read_dataset(objects=CLASSES, people=["pedro"])
 
     input_shape = x.shape[1:]
 
