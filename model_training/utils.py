@@ -58,11 +58,16 @@ def write_results(train_acc, val_acc, test_acc, train_loss, val_loss, test_loss,
         report, training_time="", save_path="./results/results.txt"):
     
     f = open(save_path, "w")
-    f.write(f"Training loss: {train_loss}\nTraining accuracy: {train_acc}\n")
-    f.write(f"Validation loss: {val_loss}\nValidation accuracy: {val_acc}\n")
-    f.write(f"Test loss: {test_loss}\nTest accuracy: {test_acc}\n\n")
-    f.write(report)
-    f.write(f"\nTraining time: {training_time} seconds\n")
+    if train_acc is not None:
+        f.write(f"Training loss: {train_loss}\nTraining accuracy: {train_acc}\n")
+    if val_acc is not None:
+        f.write(f"Validation loss: {val_loss}\nValidation accuracy: {val_acc}\n")
+    if test_acc is not None:
+        f.write(f"Test loss: {test_loss}\nTest accuracy: {test_acc}\n\n")
+    if report is not None:
+        f.write(report)
+    if training_time is not None:
+        f.write(f"\nTraining time: {training_time} seconds\n")
     f.close()
 
 

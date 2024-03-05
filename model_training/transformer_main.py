@@ -10,8 +10,9 @@ from tensorflow.keras import layers
 from utils import *
 
 
-CLASSES = ["bottle", "cube", "phone", "screwdriver"]
 # CLASSES = ["ball", "bottle", "woodblock"]
+# CLASSES = ["bottle", "cube", "phone", "screwdriver"]
+CLASSES = ["bottle", "cube", "plier", "screwdriver"]
 
 
 # model creation functions
