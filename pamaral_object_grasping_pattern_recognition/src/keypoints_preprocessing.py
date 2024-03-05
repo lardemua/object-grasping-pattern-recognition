@@ -20,12 +20,11 @@ class KeypointsPreprocessing:
         self.mp_results = msg
     
     def mediapipe_results_processing(self):
-        rate = rospy.Rate(10)
+        rate = rospy.Rate(20)
 
         while not rospy.is_shutdown():
             if self.mp_results is not None:
-                hands = self.mp_results.hands
-                pose = self.mp_results.pose
+                hands, pose, self.mp_results = self.mp_results.hands, self.mp_results.pose, None
 
                 points = []
 

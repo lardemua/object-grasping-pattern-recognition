@@ -7,58 +7,61 @@ import numpy as np
 import rospy
 import tensorflow as tf
 
-from std_msgs.msg import String
+from std_msgs.msg import String, Bool, Float32
+from tensorflow.math import softmax
 
-from pamaral_object_grasping_pattern_recognition.msg import PointList
+from pamaral_object_grasping_pattern_recognition.msg import PointList, ObjectPrediction
 
 
 class ObjectClassifier:
-    def __init__(self, cnn_model_path, transformer_model_path):
-        self.cnn_model = tf.keras.models.load_model(cnn_model_path)
-        self.transformer_model = tf.keras.models.load_model(transformer_model_path)
+    def __init__(self, model_path):
+        self.model = tf.keras.models.load_model(model_path)
+        self.model.get_layer("dense_2").activation = None
         
-        self.labels = ["bottle", "cube", "phone", "screwdriver"]
-        #self.labels = ["ball", "bottle", "woodblock"]
+        # self.labels = ["ball", "bottle", "woodblock"]
+        # self.labels = ["bottle", "cube", "phone", "screwdriver"]
+        self.labels = ["bottle", "cube", "plier", "screwdriver"]
 
         self.preprocessed_points = None
 
-        self.object_class_pub = rospy.Publisher("object_class", String, queue_size=1)
+        self.object_class_pub = rospy.Publisher("object_class", ObjectPrediction, queue_size=1)
         self.preprocessed_points_sub = rospy.Subscriber("preprocessed_points", PointList, self.preprocessed_points_callback)
 
     def preprocessed_points_callback(self, msg):
         self.preprocessed_points = msg.points
 
     def preprocessed_points_processing(self):
-        rate = rospy.Rate(10)
+        rate = rospy.Rate(20)
 
         while not rospy.is_shutdown():
             if self.preprocessed_points is not None:
-                if len(self.preprocessed_points)>0:
-                    points = [[p.x, p.y, p.z] for p in self.preprocessed_points]
+                points, self.preprocessed_points = self.preprocessed_points, None
+                msg = ObjectPrediction()
+
+                if len(points)>0:
+                    msg.is_valid = Bool(True)
+                    msg.object_class = String("")
+
+                    points = [[p.x, p.y, p.z] for p in points]
                     points = np.array(points)
 
-                    # make prediction using loaded model
-                    prediction1 = self.cnn_model.predict(tf.expand_dims(points, axis=0), verbose=0)
-                    #prediction2 = prediction1
-                    prediction2 = self.transformer_model.predict(tf.expand_dims(points, axis=0), verbose=0)
-                    if np.max(prediction1) > 0.7 and np.max(prediction2) > 0.7:
-                        prediction1 = np.argmax(prediction1)
-                        prediction2 = np.argmax(prediction2)
+                    logits = self.model.predict(tf.expand_dims(points, axis=0), verbose=0)
 
-                        if prediction1 == prediction2:
-                            prediction = self.labels[prediction1]
+                    prediction = softmax(logits, axis=1).numpy()
 
-                            # publish prediction
-                            self.object_class_pub.publish(prediction)
+                    msg.logits = [Float32(p) for p in logits[0].tolist()]
+                    msg.softmaxes = [Float32(p) for p in prediction[0].tolist()]
 
-                        else:
-                            self.object_class_pub.publish("")
-                    
-                    else:
-                        self.object_class_pub.publish("")
+                    if np.max(prediction) > 0.7:
+                        prediction = np.argmax(prediction)
+                        msg.object_class = String(self.labels[prediction])
                 
                 else:
-                    self.object_class_pub.publish("")
+                    msg.softmaxes = [Float32(0) for _ in range(len(self.labels))]
+                    msg.logits = [Float32(0) for _ in range(len(self.labels))]
+                    msg.is_valid = Bool(False)
+                    
+                self.object_class_pub.publish(msg)
                 
 
             rate.sleep()
@@ -68,10 +71,9 @@ def main():
     default_node_name = 'object_classifier'
     rospy.init_node(default_node_name)
 
-    cnn_model_path = rospy.get_param(rospy.search_param('cnn_model_path'))
-    transformer_model_path = rospy.get_param(rospy.search_param('transformer_model_path'))
+    model_path = rospy.get_param(rospy.search_param('model_path'))
 
-    object_classifier = ObjectClassifier(cnn_model_path, transformer_model_path)
+    object_classifier = ObjectClassifier(model_path)
 
     object_classifier.preprocessed_points_processing()
 

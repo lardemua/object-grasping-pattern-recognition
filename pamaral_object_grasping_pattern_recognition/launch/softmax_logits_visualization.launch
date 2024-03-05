@@ -1,0 +1,21 @@
+<launch>
+    <!-- Object Recognition Pipeline - Image to Label -->
+    <include file="$(find pamaral_object_grasping_pattern_recognition)/launch/object_recognition_pipeline.launch">
+        <arg name="input_image_topic" value="mediapipe_camera/color/image_raw"/>
+    </include>
+
+    <!-- Visualization -->
+    <node name="data_visualization" pkg="pamaral_object_grasping_pattern_recognition" type="softmax_logits_visualization.py" output="screen">
+        <param name="input_image_topic" value="mediapipe_camera/color/image_raw"/>
+    </node>
+
+    <node name="bag2softmax_logits_video" pkg="pamaral_object_grasping_pattern_recognition" type="bag2softmax_logits_video.py" output="screen">
+        <param name="input_folder" value="$(find data)/bag_files"/>
+        <param name="output_image_topic" value="mediapipe_camera/color/image_raw"/>
+        <param name="output_folder" value="$(find data)/videos"/>
+    </node>
+
+    <!-- RViz -->
+    <node name="rviz" pkg="rviz" type="rviz"
+          args="--display-config $(find pamaral_object_grasping_pattern_recognition)/config/rviz.rviz" required="false"/>
+</launch>

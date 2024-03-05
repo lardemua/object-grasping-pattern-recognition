@@ -33,7 +33,7 @@ class MediaPipeProcessing:
         rate = rospy.Rate(20)
         while not rospy.is_shutdown():
             if self.image is not None:
-                msg = self.image
+                msg, self.image = self.image, None
 
                 # Send image to Mediapipe nodes
                 self.hands_model_client.send_goal(MpHandsModelGoal(image=msg))

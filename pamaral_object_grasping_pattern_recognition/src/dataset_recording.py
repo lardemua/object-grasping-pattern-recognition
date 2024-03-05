@@ -44,7 +44,7 @@ service_proxy = rospy.ServiceProxy('/mediapipe_camera/start_capture', Empty)
 
 service_proxy()
 
-for i in range(25,0,-1):
+for i in range(20,0,-1):
     print(f"Stopping in {i}")
 
     time.sleep(1)

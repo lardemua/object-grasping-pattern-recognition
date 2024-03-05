@@ -47,7 +47,7 @@ class HandsModelMediapipe:
             rospy.logerr(e)
             return
         
-        if timestamp < self.last_ts or timestamp - self.last_ts > 2000:
+        if timestamp < self.last_ts or timestamp - self.last_ts > 1000:
             self.hand_landmarker = HandLandmarker.create_from_options(self.options)
         
         self.last_ts = timestamp

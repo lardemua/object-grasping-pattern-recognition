@@ -6,8 +6,8 @@
     </include>
     
     <node name="dataset_mediapipe_preprocessing" pkg="pamaral_object_grasping_pattern_recognition" type="dataset_mediapipe_preprocessing.py" output="screen">
-        <param name="input_folder" value="$(find data)/bag_files"/>
+        <param name="input_folder" value="$(find data)/bag_files/real_time_testing2"/>
         <param name="output_image_topic" value="$(arg image_topic)"/>
-        <param name="output_folder" value="$(find data)/dataset"/>
+        <param name="output_folder" value="$(find data)/dataset/real_time_testing2"/>
     </node>
 </launch>

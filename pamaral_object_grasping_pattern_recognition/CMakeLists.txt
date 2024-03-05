@@ -58,6 +58,7 @@ add_message_files(
   MpHand.msg
   MpPose.msg
   MpResults.msg
+  ObjectPrediction.msg
   PointList.msg
 )
 

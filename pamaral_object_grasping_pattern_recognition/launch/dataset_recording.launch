@@ -2,16 +2,21 @@
     <!-- MediaPipe Camera - Orbbec Astra Pro behind the robot -->
     <include file="$(find larcc_antecipative_object_handover)/launch/usb_cam.launch">
         <arg name="camera_name" value="mediapipe_camera"/>
+        <arg name="create_suspended" value="true"/>
         <arg name="image_view" value="false"/>
         <arg name="video_device" value="/dev/video0"/>
     </include>
 
-    <include file="$(find pamaral_object_grasping_pattern_recognition)/launch/mediapipe_processing.launch">
+    <!-- <include file="$(find pamaral_object_grasping_pattern_recognition)/launch/mediapipe_processing.launch">
         <arg name="input_image_topic" value="mediapipe_camera/color/image_raw"/>
-    </include>
+    </include> -->
 
     <node name="dataset_recording" pkg="pamaral_object_grasping_pattern_recognition" type="dataset_recording.py" output="screen">
-        <param name="output_folder" value="$(find data)/bag_files"/>
+        <param name="output_folder" value="$(find data)/bag_files/real_time_testing2"/>
+    </node>
+
+    <node name="data_visualization" pkg="pamaral_object_grasping_pattern_recognition" type="data_visualization.py" output="screen">
+        <param name="input_image_topic" value="mediapipe_camera/color/image_raw"/>
     </node>
 
     <node name="rviz" pkg="rviz" type="rviz"

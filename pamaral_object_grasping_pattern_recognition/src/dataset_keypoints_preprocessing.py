@@ -26,7 +26,7 @@ class DatasetKeypointsPreprocessing:
             if os.path.isfile(file_path) and file_path.endswith(".json"):
                 self.filenames.append(filename)
         
-        # Create the MediaPipe Results Publisher        
+        # Create the MediaPipe Results Publisher
         self.mediapipe_results_publisher = rospy.Publisher("mediapipe_results", MpResults, queue_size=1)
         self.preprocessed_points_sub = rospy.Subscriber("preprocessed_points", PointList, self.preprocessed_points_callback)
 
@@ -34,8 +34,7 @@ class DatasetKeypointsPreprocessing:
         # Extract and write the hands keypoints from the message
         points = [[p.x, p.y, p.z] for p in msg.points]
 
-        if len(points) > 0:
-            self.data.append({'points': points})
+        self.data.append({'points': points})
 
         if len(self.mediapipe_results) > 0:
             self.mediapipe_results_publisher.publish(MpResults(**self.mediapipe_results.pop(0)))
