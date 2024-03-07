@@ -12,7 +12,7 @@
     </include> -->
 
     <node name="dataset_recording" pkg="pamaral_object_grasping_pattern_recognition" type="dataset_recording.py" output="screen">
-        <param name="output_folder" value="$(find data)/bag_files/real_time_testing2"/>
+        <param name="output_folder" value="$(find data)/bag_files"/>
     </node>
 
     <node name="data_visualization" pkg="pamaral_object_grasping_pattern_recognition" type="data_visualization.py" output="screen">
