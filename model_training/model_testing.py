@@ -127,6 +127,17 @@ if __name__ == "__main__":
         # logits
         logits = model.predict(x)
 
+        print(logits[:,2] > 6)
+
+        plt.figure(figsize = (10,5))
+        plt.hist(logits, bins=range(0, 15, 1), label=CLASSES)
+        plt.xlabel("Logits")
+        plt.ylabel("Histogram")
+        plt.xticks(range(0, 15))
+        
+        plt.tight_layout()
+        plt.savefig(f"./results/{object_tested}_cnn_logits_hist.svg")
+
         plot_logits(logits.T, valid_indexes, [o if len(o) <=6 else f"{o[:5]}." for o in CLASSES],
                             show=False, save_path = f"./results/{object_tested}_cnn_logits.svg")
         

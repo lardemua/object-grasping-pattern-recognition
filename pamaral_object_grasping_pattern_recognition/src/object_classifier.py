@@ -47,13 +47,13 @@ class ObjectClassifier:
 
                     logits = self.model.predict(tf.expand_dims(points, axis=0), verbose=0)
 
-                    prediction = softmax(logits, axis=1).numpy()
+                    softmaxes = softmax(logits, axis=1).numpy()
 
                     msg.logits = [Float32(p) for p in logits[0].tolist()]
-                    msg.softmaxes = [Float32(p) for p in prediction[0].tolist()]
+                    msg.softmaxes = [Float32(p) for p in softmaxes[0].tolist()]
 
-                    if np.max(prediction) > 0.7:
-                        prediction = np.argmax(prediction)
+                    if np.max(logits) > 5:
+                        prediction = np.argmax(logits)
                         msg.object_class = String(self.labels[prediction])
                 
                 else:
