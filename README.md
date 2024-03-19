@@ -6,18 +6,24 @@ Object Recognition using the Object's Grasping Pattern
 
 1. Install [ROS Noetic](https://wiki.ros.org/noetic/Installation/Ubuntu).
 
-2. Clone this repository and [usb_cam](https://github.com/ros-drivers/usb_cam) into your catkin workspace:
+2. Set up the usb_cam package by first installing the following dependencies:
+
+   ```
+   sudo apt install libv4l-dev v4l-utils
+   ```
+   
+   Then close the [usb_cam repository](https://github.com/ros-drivers/usb_cam) and switch to the 'develop' branch which corresponds to ROS noetic:
+   ```
+   cd ~/catkin_ws/src
+   git clone https://github.com/ros-drivers/usb_cam.git
+   cd usb_cam & git checkout develop
+   ```
+
+3. Next clone this repository into your catkin workspace:
 
     ```
     cd ~/catkin_ws/src
     git clone https://github.com/lardemua/object_grasping_pattern_recognition.git
-    git clone https://github.com/ros-drivers/usb_cam.git
-    ```
-
-3. Install additional system dependencies:
-
-    ```
-    sudo apt install libv4l-dev python3-pip v4l-utils
     ```
 
 4. Compile the catkin workspace:
