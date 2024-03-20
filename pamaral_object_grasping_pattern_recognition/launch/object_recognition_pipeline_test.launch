@@ -1,19 +1,17 @@
 <launch>
-    <!-- MediaPipe Camera - Orbbec Astra Pro behind the robot -->
-    <include file="$(find larcc_antecipative_object_handover)/launch/usb_cam.launch">
-        <arg name="camera_name" value="mediapipe_camera"/>
-        <arg name="image_view" value="false"/>
-        <arg name="video_device" value="/dev/video0"/>
-    </include>
+    <!-- Orbbec Astra Pro behind the robot -->
+    <node name="usb_cam_behind" pkg="usb_cam" type="usb_cam_node" output="screen" >
+        <rosparam command="load" file="$(find larcc_bringup)/config/camera_behind.yml" />
+    </node>
 
     <!-- Object Recognition Pipeline - Image to Label -->
     <include file="$(find pamaral_object_grasping_pattern_recognition)/launch/object_recognition_pipeline.launch">
-        <arg name="input_image_topic" value="mediapipe_camera/color/image_raw"/>
+        <arg name="input_image_topic" value="usb_cam_behind/image_raw"/>
     </include>
 
     <!-- Visualization -->
     <node name="data_visualization" pkg="pamaral_object_grasping_pattern_recognition" type="data_visualization.py" output="screen">
-        <param name="input_image_topic" value="mediapipe_camera/color/image_raw"/>
+        <param name="input_image_topic" value="usb_cam_behind/image_raw"/>
     </node>
 
     <!-- Test -->

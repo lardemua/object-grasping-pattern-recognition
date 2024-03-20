@@ -6,9 +6,8 @@ import rospy
 
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
-from std_msgs.msg import String
 
-from pamaral_object_grasping_pattern_recognition.msg import MpResults, PointList
+from pamaral_object_grasping_pattern_recognition.msg import MpResults, ObjectPrediction, PointList
 
 
 class DataVisualization:
@@ -30,13 +29,13 @@ class DataVisualization:
         self.mp_drawing_publisher = rospy.Publisher("mp_drawing", Image, queue_size=1)
         self.mp_points_image_publisher = rospy.Publisher("mp_points_image", Image, queue_size=1)
 
-        self.object_class_sub = rospy.Subscriber("object_class", String, self.object_class_callback)
+        self.object_class_sub = rospy.Subscriber("object_class", ObjectPrediction, self.object_class_callback)
         self.image_sub = rospy.Subscriber(input_topic, Image, self.image_callback)
         self.mediapipe_results_sub = rospy.Subscriber("mediapipe_results", MpResults, self.mediapipe_results_callback)
         self.preprocessed_points_sub = rospy.Subscriber("preprocessed_points", PointList, self.preprocessed_points_callback)
     
     def object_class_callback(self, msg):
-        self.object_class = msg.data
+        self.object_class = msg.object_class.data
     
     def image_callback(self, msg):
         self.last_image_msgs.append(msg)

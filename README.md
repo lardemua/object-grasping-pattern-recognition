@@ -6,18 +6,7 @@ Object Recognition using the Object's Grasping Pattern
 
 1. Install [ROS Noetic](https://wiki.ros.org/noetic/Installation/Ubuntu).
 
-2. Set up the usb_cam package by first installing the following dependencies:
-
-   ```
-   sudo apt install libv4l-dev v4l-utils
-   ```
-   
-   Then clone the [usb_cam repository](https://github.com/ros-drivers/usb_cam) and switch to the 'develop' branch which corresponds to ROS noetic:
-   ```
-   cd ~/catkin_ws/src
-   git clone https://github.com/ros-drivers/usb_cam.git
-   cd usb_cam & git checkout develop
-   ```
+2. Follow the instructions in the [larcc_drivers repository](https://github.com/lardemua/larcc_drivers).
 
 3. Next clone this repository into your catkin workspace:
 
