@@ -1,8 +1,6 @@
 <launch>
-    <!-- Orbbec Astra Pro behind the robot -->
-    <node name="usb_cam_behind" pkg="usb_cam" type="usb_cam_node" output="screen" >
-        <rosparam command="load" file="$(find larcc_bringup)/config/camera_behind.yml" />
-    </node>
+    <!-- MediaPipe Camera - Orbbec Astra Pro behind the robot -->
+    <include file="$(find pamaral_object_grasping_pattern_recognition)/launch/cameras.launch" />
 
     <!-- Object Recognition Pipeline - Image to Label -->
     <include file="$(find pamaral_object_grasping_pattern_recognition)/launch/object_recognition_pipeline.launch">

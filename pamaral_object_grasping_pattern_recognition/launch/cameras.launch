@@ -1,0 +1,27 @@
+<launch>
+    <arg name="camera1_create_suspended" default="false">
+    <arg name="camera1_prefix" default="behind"/>
+    <arg name="camera1_serial_number" default="20101230094"/>
+    <arg name="num_orbbec_cameras" default="1"/>
+
+    <!-- usb_cam node to publish rgb images from behind camera -->
+    <node name="usb_cam_$(arg camera1_prefix)" pkg="usb_cam" type="usb_cam_node" output="screen" >
+        <param name="camera1_create_suspended" value="$(arg camera1_create_suspended)"/>
+        <rosparam command="load" file="$(find pamaral_object_grasping_pattern_recognition)/config/camera_$(arg camera1_prefix).yml"/>
+    </node>
+
+    <!-- astra_camera node to publish depth images from behind camera -->
+    <include file="$(find astra_camera)/launch/astra_pro.launch">
+        <arg name="camera_name" value="orbbec_$(arg camera1_prefix)"/>
+        <arg name="enable_point_cloud" value="false"/>
+        <arg name="publish_tf" default="false"/>
+        <arg name="depth_width" default="640"/>
+        <arg name="depth_height" default="480"/>
+        <arg name="depth_fps" default="30"/>
+        <arg name="enable_color" value="false"/>
+        <arg name="enable_ir" default="false"/>
+        <arg name="use_uvc_camera" value="false"/>
+        <arg name="serial_number" value="$(arg camera1_serial_number)"/>
+        <arg name="device_num" value="$(arg num_orbbec_cameras)"/>
+    </include>
+</launch>
