@@ -1,5 +1,5 @@
 <launch>
-    <arg name="input_image_topic" default="camera/color/image_raw"/>
+    <arg name="input_image_topic" default="color/image_raw"/>
 
     <node name="mediapipe_processing" pkg="pamaral_object_grasping_pattern_recognition" type="mediapipe_processing.py" output="screen">
         <param name="input_image_topic" value="$(arg input_image_topic)"/>
