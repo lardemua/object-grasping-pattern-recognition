@@ -15,7 +15,7 @@ class DataVisualization:
         Class to publish the image with the hand landmarks and the predicted object label drawn on it
     """
 
-    def __init__(self, input_topic):
+    def __init__(self):
         # Drawing Constants
         self.lines = [[0, 1], [1, 2], [2, 3], [3, 4], [0, 5], [5, 6], [6, 7], [7, 8],
                     [5, 9], [9, 10], [10, 11], [11, 12], [9, 13], [13, 14], [14, 15],
@@ -30,7 +30,7 @@ class DataVisualization:
         self.mp_points_image_publisher = rospy.Publisher("mp_points_image", Image, queue_size=1)
 
         self.object_class_sub = rospy.Subscriber("object_class", ObjectPrediction, self.object_class_callback)
-        self.image_sub = rospy.Subscriber(input_topic, Image, self.image_callback)
+        self.image_sub = rospy.Subscriber("color/image_raw", Image, self.image_callback)
         self.mediapipe_results_sub = rospy.Subscriber("mediapipe_results", MpResults, self.mediapipe_results_callback)
         self.preprocessed_points_sub = rospy.Subscriber("preprocessed_points", PointList, self.preprocessed_points_callback)
     
@@ -110,9 +110,9 @@ def main():
     default_node_name = 'data_visualization'
     rospy.init_node(default_node_name, anonymous=False)
 
-    input_topic = rospy.get_param(rospy.search_param('input_image_topic'))
+    # input_topic = rospy.get_param(rospy.search_param('input_image_topic'))
 
-    DataVisualization(input_topic=input_topic)
+    DataVisualization()
 
     rospy.spin()
 
